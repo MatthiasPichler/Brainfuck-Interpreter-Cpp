@@ -23,20 +23,29 @@ Interpreter::Interpreter(std::string file,
 	
 	inputstream.str(input);
 	
-	try{
-		run();
-	} catch(std::underflow_error &ufe){
-		std::cerr << ufe.what();
+	
+	
+	
+}
+
+void Interpreter::setup(){
+	char c;
+	
+	while(filestream.get(c)){
+		for(int i = 0; i < 8; i++){
+			if(c == tokens[i]){
+				code.push_back(c);
+			}
+		}
 	}
-	
-	
 }
 
 void Interpreter::run() {
 	
 	char c;
 	
-	while(filestream.get(c)){
+	for(int i = 0; i < code.length(); i++){
+		c = code[i];
 		
 		switch(c){
 			case '<':
@@ -79,11 +88,29 @@ void Interpreter::run() {
 				break;
 			
 			case '[':
-				//TODO
+				//don't process loop
+				if(buffer[pointer] == 0){
+					int loop = 1;
+					while(loop > 0){
+						i++;
+						if(code[i] == '['){
+							loop++;
+						} else if (code[i] == ']'){
+							loop--;
+						}
+					}
+				} else {
+					stack.push(i);
+				}
+				
 				break;
 			
 			case ']':
-				//TODO
+				if(buffer[pointer] != 0){
+					i = stack.top();
+				} else {
+					stack.pop();
+				}
 				break;
 		}
 		
